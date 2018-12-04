@@ -1,0 +1,19 @@
+[kafka]
+kafka-topic = "integration"
+kafka-brokers = "127.0.0.1:8410"
+kafka-group = "metric-transfer"
+thread-num = 4
+
+[log]
+log-path = "/Users/nongcaihua/go/src/metric-transfer/"
+log-level = "info"
+
+[network-filter]
+network-filter-enable = true
+network-metrics = [{"metric": "cpu.idle", "dimensions": [{"k": "name", "v": "abc"}]}, {"metric": "disk.io.write.bytes/s", "dimensions": [{"k": "name", "v": "cds-s3-proxy"}]}]
+
+[network-sender]
+network-sender-enable = true
+network-sender-api = "http://127.0.0.1:1890/push"
+#sender interval : unit Second
+network-sender-interval = 10
