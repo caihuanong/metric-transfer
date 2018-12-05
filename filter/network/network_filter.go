@@ -18,7 +18,7 @@ func NewNetWorkFilter(config []g.MetricFilterConfig) *NetWorkFilter {
 		filter[metricConfig.Metric] = tags
 	}
 	to := make(map[string]struct{})
-	to["network"] = struct{}{}
+	to["http"] = struct{}{}
 
 	nf := &NetWorkFilter{
 		filter: filter,

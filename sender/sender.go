@@ -4,11 +4,11 @@ import (
 	"metric-transfer/g"
 	"metric-transfer/g/log"
 	"metric-transfer/models"
-	"metric-transfer/sender/network"
+	"metric-transfer/sender/http"
 )
 
 const (
-	NETWORK = "network"
+	HTTP = "http"
 )
 
 type Sender interface {
@@ -28,9 +28,9 @@ func NewSenderManager(metricCh chan g.TransMessage) *SenderManager {
 	}
 	s.MetricCh = metricCh
 	config := g.GetSenderConfig()
-	if config.NetworkSenderEnable {
-		if sender, err := network.NewNetworkSender(config.NetworkSenderConfig); err == nil {
-			s.Senders[NETWORK] = sender
+	if config.HttpSenderEnable {
+		if sender, err := http.NewHttpSender(config.HttpSenderConfig); err == nil {
+			s.Senders[HTTP] = sender
 		}
 	}
 	return s
