@@ -17,14 +17,14 @@ var (
 	enableAuth   = flag.Bool("kafka-sasl-auth", false, "Kafka enable SASL auth")
 	consumerNum  = flag.Int("thread-num", 4, "Kafka consume thread num")
 
-	//network filter
-	networkFilterEnable = flag.Bool("network-filter-enable", false, "enable filter network metrics")
-	networkMetrics      = flag.String("network-metrics", "test", "filter metrics and tags")
+	//http filter
+	networkFilterEnable = flag.Bool("http-filter-enable", false, "enable filter http metrics")
+	networkMetrics      = flag.String("http-metrics", "test", "filter metrics and tags")
 
-	//network sender
-	networkSenderEnable   = flag.Bool("network-sender-enable", false, "enable send network metrics")
-	netWorkSenderApi      = flag.String("network-sender-api", "test", "address of network sender send to")
-	networkSenderInterval = flag.Int("network-sender-interval", 30, "network sender message's interval")
+	//http sender
+	httpSenderEnable   = flag.Bool("http-sender-enable", false, "enable send http metrics")
+	httpSenderApi      = flag.String("http-sender-api", "test", "address of http sender send to")
+	httpSenderInterval = flag.Int("http-sender-interval", 30, "http sender message's interval")
 )
 
 type KafkaConfig struct {
@@ -43,8 +43,8 @@ type FilterConfig struct {
 }
 
 type SenderConfig struct {
-	NetworkSenderEnable bool
-	NetworkSenderConfig
+	HttpSenderEnable bool
+	HttpSenderConfig
 }
 
 type MetricFilterConfig struct {
@@ -52,9 +52,9 @@ type MetricFilterConfig struct {
 	Dimensions map[string]string
 }
 
-type NetworkSenderConfig struct {
-	NetWorkSenderApi string
-	Interval         int
+type HttpSenderConfig struct {
+	HttpSenderApi string
+	Interval      int
 }
 
 var (
@@ -98,13 +98,13 @@ func initKafkaConfig() {
 
 func initSenderConfig() {
 	senderConfig = new(SenderConfig)
-	networkSenderConfig := NetworkSenderConfig{
-		NetWorkSenderApi: *netWorkSenderApi,
-		Interval:         *networkSenderInterval,
+	httpSenderConfig := HttpSenderConfig{
+		HttpSenderApi: *httpSenderApi,
+		Interval:      *httpSenderInterval,
 	}
 
-	senderConfig.NetworkSenderEnable = *networkSenderEnable
-	senderConfig.NetworkSenderConfig = networkSenderConfig
+	senderConfig.HttpSenderEnable = *httpSenderEnable
+	senderConfig.HttpSenderConfig = httpSenderConfig
 }
 
 type Dimension struct {

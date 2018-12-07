@@ -1,4 +1,4 @@
-package network
+package http
 
 import (
 	"bytes"
@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-type NetworkSender struct {
+type HttpSender struct {
 	mu          sync.Mutex
 	method      string
 	apiAddr     string
@@ -21,18 +21,18 @@ type NetworkSender struct {
 	metricsBuff []models.DataPoint
 }
 
-func NewNetworkSender(config g.NetworkSenderConfig) (*NetworkSender, error) {
-	sender := new(NetworkSender)
-	sender.apiAddr = config.NetWorkSenderApi
+func NewHttpSender(config g.HttpSenderConfig) (*HttpSender, error) {
+	sender := new(HttpSender)
+	sender.apiAddr = config.HttpSenderApi
 	sender.method = "POST"
 	sender.ticker = time.NewTicker(time.Second * time.Duration(config.Interval))
 	sender.httpClient = &http.Client{}
 	sender.metricsBuff = []models.DataPoint{}
-	log.Infof("NewNetworkSender finished: %+v", sender)
+	log.Infof("NewHttpSender finished: %+v", sender)
 	return sender, nil
 }
 
-func (s *NetworkSender) Send(metrics []models.DataPoint) {
+func (s *HttpSender) Send(metrics []models.DataPoint) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -40,14 +40,14 @@ func (s *NetworkSender) Send(metrics []models.DataPoint) {
 	log.Debug("Buff Size = ", len(s.metricsBuff))
 }
 
-func (s *NetworkSender) Run() {
+func (s *HttpSender) Run() {
 	for {
 		<-s.ticker.C
 		s.send()
 	}
 }
 
-func (s *NetworkSender) send() {
+func (s *HttpSender) send() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -57,25 +57,25 @@ func (s *NetworkSender) send() {
 	var rawRequest io.Reader
 	jsonRequest, err := json.Marshal(s.metricsBuff)
 	if err != nil {
-		log.Info("NetworkSender marshal metricsBuff error, ", err)
+		log.Info("HttpSender marshal metricsBuff error, ", err)
 		return
 	}
 	rawRequest = bytes.NewReader(jsonRequest)
 	// build request
 	req, err := http.NewRequest(s.method, s.apiAddr, rawRequest)
 	if err != nil {
-		log.Info("NetworkSender build request error, ", err)
+		log.Info("HttpSender build request error, ", err)
 		return
 	}
 	req.Header.Add("Content-Type", "application/json")
 	resp, err := s.httpClient.Do(req)
 	if err != nil {
-		log.Info("NetworkSender do request error: ", resp)
+		log.Info("HttpSender do request error: ", resp)
 		return
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		log.Info("NetworkSender resp statusCode is not 200, code = ", resp.StatusCode)
+		log.Info("HttpSender resp statusCode is not 200, code = ", resp.StatusCode)
 	}
 	s.metricsBuff = s.metricsBuff[:0]
 }
