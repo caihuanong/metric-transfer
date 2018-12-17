@@ -18,8 +18,8 @@ var (
 	consumerNum  = flag.Int("thread-num", 4, "Kafka consume thread num")
 
 	//http filter
-	networkFilterEnable = flag.Bool("http-filter-enable", false, "enable filter http metrics")
-	networkMetrics      = flag.String("http-metrics", "test", "filter metrics and tags")
+	metricAndTagsFilterEnabled = flag.Bool("metric-tags-filter-enable", false, "enable filter http metrics")
+	metricAndTags              = flag.String("metric-tags", "test", "filter metrics and tags")
 
 	//http sender
 	httpSenderEnable   = flag.Bool("http-sender-enable", false, "enable send http metrics")
@@ -38,8 +38,8 @@ type KafkaConfig struct {
 }
 
 type FilterConfig struct {
-	NetworkFilterEnable bool
-	NetworkFilterConfig []MetricFilterConfig
+	MetricAndTagsFilterEnabled bool
+	MetricAndTagsFilterConfig  []MetricAndTagsFilterConfig
 }
 
 type SenderConfig struct {
@@ -47,9 +47,9 @@ type SenderConfig struct {
 	HttpSenderConfig
 }
 
-type MetricFilterConfig struct {
-	Metric     string
-	Dimensions map[string]string
+type MetricAndTagsFilterConfig struct {
+	Metric string
+	Tags   map[string]string
 }
 
 type HttpSenderConfig struct {
@@ -121,19 +121,19 @@ func initFilterConfig() {
 	filterConfig = new(FilterConfig)
 
 	var rawFilters []RawMetricFilter
-	if err := json.Unmarshal([]byte(*networkMetrics), &rawFilters); err != nil {
+	if err := json.Unmarshal([]byte(*metricAndTags), &rawFilters); err != nil {
 		log.Fatalln("Error: ", err)
 	}
 	log.Infof("rawFilters %+v", rawFilters)
-	var metricFilters []MetricFilterConfig
+	var metricFilters []MetricAndTagsFilterConfig
 	for _, filter := range rawFilters {
 		var dims = make(map[string]string)
 		for _, dim := range filter.Dimensions {
 			dims[dim.K] = dim.V
 		}
-		metricFilters = append(metricFilters, MetricFilterConfig{filter.Metric, dims})
+		metricFilters = append(metricFilters, MetricAndTagsFilterConfig{filter.Metric, dims})
 	}
 
-	filterConfig.NetworkFilterEnable = *networkFilterEnable
-	filterConfig.NetworkFilterConfig = metricFilters
+	filterConfig.MetricAndTagsFilterEnabled = *metricAndTagsFilterEnabled
+	filterConfig.MetricAndTagsFilterConfig = metricFilters
 }

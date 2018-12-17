@@ -28,8 +28,8 @@ type FilterManager struct {
 func NewFilterManager(metricCh chan g.TransMessage) *FilterManager {
 	filterConfig := g.GetFilterConfig()
 	fm := new(FilterManager)
-	if filterConfig.NetworkFilterEnable {
-		filter := network.NewNetWorkFilter(filterConfig.NetworkFilterConfig)
+	if filterConfig.MetricAndTagsFilterEnabled {
+		filter := network.NewMetricAndTagsFilter(filterConfig.MetricAndTagsFilterConfig)
 		fm.Filters = append(fm.Filters, filter)
 	}
 	kafkaConfig := g.GetKafKaConfig()

@@ -9,8 +9,8 @@ log-path = "/Users/nongcaihua/go/src/metric-transfer/"
 log-level = "info"
 
 [network-filter]
-network-filter-enable = true
-network-metrics = [{"metric": "cpu.idle", "dimensions": [{"k": "name", "v": "abc"}]}, {"metric": "disk.io.write.bytes/s", "dimensions": [{"k": "name", "v": "cds-s3-proxy"}]}]
+metric-tags-filter-enable = true
+metric-tags = [{"metric": "cpu.idle", "dimensions": [{"k": "name", "v": "abc"}]}, {"metric": "disk.io.write.bytes/s", "dimensions": [{"k": "name", "v": "cds-s3-proxy"}]}]
 
 [http-sender]
 http-sender-enable = true

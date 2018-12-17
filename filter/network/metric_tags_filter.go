@@ -6,21 +6,21 @@ import (
 	"metric-transfer/models"
 )
 
-type NetWorkFilter struct {
+type MetricAndTagsFilter struct {
 	filter map[string](map[string]string) //a map :metric_name -> tagK:tagV, use to filter datapoints
 	to     map[string]struct{}            //datapoints after filtering send to
 }
 
-func NewNetWorkFilter(config []g.MetricFilterConfig) *NetWorkFilter {
+func NewMetricAndTagsFilter(config []g.MetricAndTagsFilterConfig) *MetricAndTagsFilter {
 	filter := make(map[string](map[string]string))
 	for _, metricConfig := range config {
-		tags := metricConfig.Dimensions
+		tags := metricConfig.Tags
 		filter[metricConfig.Metric] = tags
 	}
 	to := make(map[string]struct{})
 	to["http"] = struct{}{}
 
-	nf := &NetWorkFilter{
+	nf := &MetricAndTagsFilter{
 		filter: filter,
 		to:     to,
 	}
@@ -28,10 +28,10 @@ func NewNetWorkFilter(config []g.MetricFilterConfig) *NetWorkFilter {
 	return nf
 }
 
-func (nf *NetWorkFilter) FilterMetric(datapoints []models.DataPoint, metricCh chan g.TransMessage) {
+func (nf *MetricAndTagsFilter) FilterMetric(datapoints []models.DataPoint, metricCh chan g.TransMessage) {
 	var targetPoints []models.DataPoint
 	for _, point := range datapoints {
-		if nf.filterNameAndTags(point) {
+		if nf.filterMetricAndTags(point) {
 			targetPoints = append(targetPoints, point)
 		}
 	}
@@ -46,7 +46,7 @@ func (nf *NetWorkFilter) FilterMetric(datapoints []models.DataPoint, metricCh ch
 	}
 }
 
-func (nf *NetWorkFilter) filterNameAndTags(point models.DataPoint) bool {
+func (nf *MetricAndTagsFilter) filterMetricAndTags(point models.DataPoint) bool {
 	//filter by metricName
 	if tags, ok := nf.filter[point.MetricName]; ok {
 		//filter by tags
